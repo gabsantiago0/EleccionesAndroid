@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Elecciones</string>
+    <string name="textViewInfo">ELECCIONES EN LA COMUNIDAD</string>
+    <string name="buttonLogin">Iniciar Sesion</string>
+    <string name="editTextLogin">Introduce tu DNI</string>
+    <string name="toolbar">APP ELECCIONES</string>
+    <string name="candidateName">Juan  "Chorizo"  Cuesta</string>
+    <string name="candidatePp">Esta, nuestra Comunidad</string>
+    <string name="toolbarTitle">Votación</string>
+    <string name="buttonVotos">Votos 0/3</string>
+</resources>

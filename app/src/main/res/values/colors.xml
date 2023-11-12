@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="cP">#F4DE8E</color>
+    <color name="cS">#1BB9D1</color>
+
+    <color name="rP">#AA00FF</color>
+    <color name="pA">#FF6D00</color>
+    <color name="nC">#2962FF</color>
+    <color name="pV">#FFFB00</color>
+    <color name="uP">#D50000</color>
+
+
+</resources>
