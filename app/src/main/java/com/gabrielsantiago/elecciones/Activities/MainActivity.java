@@ -8,9 +8,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.gabrielsantiago.elecciones.BBDD.DBHelper;
 import com.gabrielsantiago.elecciones.R;
 
 public class MainActivity extends AppCompatActivity {
+
+    DBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,18 +23,41 @@ public class MainActivity extends AppCompatActivity {
         Button botonLogin = findViewById(R.id.buttonLogin);
         EditText dni = findViewById(R.id.editTextLogin);
 
+        //Boton que te manda a SpinnerActivity
         botonLogin.setOnClickListener(v -> {
 
-            if (validarDni(String.valueOf(dni.getText()))){
-                Intent intent = new Intent(MainActivity.this,SpinnerActivity.class);
-                startActivity(intent);
+            String dniString = dni.getText().toString();
+            Intent intent = new Intent(MainActivity.this,SpinnerActivity.class);
+            DBHelper dbHelper = new DBHelper(this);
+
+            if (validarDni(dniString)) {
+                //Si el dni es valido:
+                if (dbHelper.existeUsuario(dniString)) {
+                    if (dbHelper.hasVotado(dniString)) {
+                        // Usuario existe y ha votado
+                        Toast.makeText(this, "EL usuario con DNI "+dniString+"" +
+                                " ya ha votado.", Toast.LENGTH_SHORT).show();
+                        startActivity(intent);
+                    } else {
+                        // Usuario existe pero no ha votado
+                        Toast.makeText(this, "EL usuario con DNI "+dniString+"" +
+                                " todavia no ha votado", Toast.LENGTH_SHORT).show();
+                        startActivity(intent);
+                    }
+                } else {
+                    // Usuario no existe, registrarlo
+                    dbHelper.registrarUsuario(dniString);
+                    Toast.makeText(this, "EL usuario con DNI "+dniString+"" +
+                            " ha sido registrado, vota por favor", Toast.LENGTH_SHORT).show();
+                    startActivity(intent);
+                }
             }
         });
 
     }
 
     private boolean validarDni(String dni) {
-        if (dni.isEmpty() || dni.length()<9) {
+        if (dni.isEmpty() || dni.length() < 9) {
             Toast.makeText(this, "El campo DNI está vacío o es demasiado corto", Toast.LENGTH_SHORT).show();
             return false;
         } else if (!Character.isLetter(dni.charAt(8))) {
@@ -48,10 +74,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
-
 
 
 }
