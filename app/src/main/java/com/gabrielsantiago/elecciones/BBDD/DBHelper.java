@@ -160,6 +160,20 @@ public class DBHelper extends SQLiteOpenHelper {
         return estado;
     }
 
+    public boolean VotarCandidato(String nombre) {
+        boolean estado = false;
+        SQLiteDatabase db = getReadableDatabase();
+        ContentValues values = new ContentValues();
+        int filasAfectadas = db.update(TABLE_NAME2, values, COLUMN_NIF + " = ?", new String[]{dni});
+        db.close();
+
+        if (filasAfectadas > 0) {
+            return true;
+        }
+        return estado;
+    }
+
+
 
 }
 

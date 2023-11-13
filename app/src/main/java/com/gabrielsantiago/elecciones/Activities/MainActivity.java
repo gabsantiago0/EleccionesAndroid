@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
                         // Usuario existe y ha votado
                         Toast.makeText(this, "EL usuario con DNI "+dniString+"" +
                                 " ya ha votado.", Toast.LENGTH_SHORT).show();
+                        intent.putExtra("dniString",dniString);
                         startActivity(intent);
                     } else {
                         // Usuario existe pero no ha votado

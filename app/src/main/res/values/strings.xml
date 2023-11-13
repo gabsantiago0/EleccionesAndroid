@@ -8,4 +8,5 @@
     <string name="candidatePp">Esta, nuestra Comunidad</string>
     <string name="toolbarTitle">Votación</string>
     <string name="buttonVotos">Votos 0/3</string>
+    <string name="buttonVotosFinal">Votar</string>
 </resources>
