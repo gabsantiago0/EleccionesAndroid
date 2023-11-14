@@ -11,7 +11,11 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.gabrielsantiago.elecciones.Clases.Candidato;
 import com.gabrielsantiago.elecciones.Clases.Usuario;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -62,6 +66,24 @@ public class DBHelper extends SQLiteOpenHelper {
                     COLUMN_NIF + " TEXT," +
                     COLUMN_HAVOTADO + " TINYINT)");
 
+            //Insertamos candidatos
+            registrarCandidatoBBDD(new CandidatoBBDD(0, 0, "Doña Concha", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(1, 0, "Marisa", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(2, 0, "Vicenta", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(3, 1, "Lucía", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(4, 1, "Belén", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(5, 1, "Bea", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(6, 2, "Juan 'Chorizo' Cuesta", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(7, 2, "Isabel 'Yerbas'", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(8, 2, "Mauri", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(9, 3, "Paco", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(10, 3, "'Josemi' Cuesta", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(11, 3, "Doña Concha", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(12, 4, "Emilio Delgado", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(13, 4, "Mariano Delgado", 0));
+            registrarCandidatoBBDD(new CandidatoBBDD(14, 4, "Jose María", 0));
+
+
             db.setTransactionSuccessful();
         } catch (SQLException e) {
             Log.e("DBManager.onCreate", e.getMessage());
@@ -78,6 +100,63 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //----------------------------------------------------------------------------
 
+    public ArrayList<String> mostrarElecciones() {
+        SQLiteDatabase db = getReadableDatabase();
+        ArrayList<String> candidadoVoto = new ArrayList<>();
+        try {
+            Cursor cursor = db.query(
+                    TABLE_NAME,
+                    new String[]{COLUMN_NOMBRE, COLUMN_VOTOS},
+                    COLUMN_VOTOS + " > ?",
+                    new String[]{"1"},
+                    null,
+                    null,
+                    null
+            );
+
+            int indiceNombre = cursor.getColumnIndex(COLUMN_NOMBRE);
+            int indiceVotos = cursor.getColumnIndex(COLUMN_VOTOS);
+
+            while (cursor.moveToNext()) {
+                if (indiceNombre != -1 && indiceVotos != -1) {
+                    String nombreCandidato = cursor.getString(indiceNombre);
+                    String votosCandidato = String.valueOf(cursor.getInt(indiceVotos));
+                    String candidato = nombreCandidato + ": " + votosCandidato + " votos";
+                    candidadoVoto.add(candidato);
+                }
+            }
+            cursor.close();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return candidadoVoto;
+    }
+
+
+    public boolean registrarCandidatoBBDD(CandidatoBBDD a) {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_CODCANDIDATO, a.getCodCandidato());
+            contentValues.put(COLUMN_CODPARTIDO, a.getCodPartido());
+            contentValues.put(COLUMN_NOMBRE, a.getNombre());
+            contentValues.put(COLUMN_VOTOS, a.getVotos());
+
+            db.beginTransaction();
+            db.insert(TABLE_NAME, null, contentValues);
+            db.setTransactionSuccessful();
+            return true;
+        } catch (SQLException exc) {
+            System.out.println(exc.getMessage());
+        } finally {
+            if (db != null && db.isOpen()) {
+                db.endTransaction();
+                db.close();
+            }
+        }
+        return false;
+    }
 
     //Metodo para saber si alguien ha votado anteriormente.
     public boolean hasVotado(String dni) {
@@ -145,7 +224,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    public boolean Votar(String dni) {
+    public boolean marcarDniComoVotado(String dni) {
         boolean estado = false;
         SQLiteDatabase db = getReadableDatabase();
         ContentValues values = new ContentValues();
@@ -160,20 +239,30 @@ public class DBHelper extends SQLiteOpenHelper {
         return estado;
     }
 
-    public boolean VotarCandidato(String nombre) {
+    public boolean votarCandidato(String nombre) {
         boolean estado = false;
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        int filasAfectadas = db.update(TABLE_NAME2, values, COLUMN_NIF + " = ?", new String[]{dni});
-        db.close();
-
-        if (filasAfectadas > 0) {
-            return true;
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_VOTOS + " FROM " + TABLE_NAME + " WHERE " + COLUMN_NOMBRE + " = ?", new String[]{nombre});
+        int indiceColumna = 0;
+        if (cursor.moveToFirst()) {
+            indiceColumna = cursor.getColumnIndex(COLUMN_VOTOS);
         }
-        return estado;
+
+        if (indiceColumna != -1) {
+            int votosActuales = cursor.getInt(indiceColumna);
+            int actualizacionVotos = votosActuales + 1;
+            values.put(COLUMN_VOTOS, actualizacionVotos);
+
+            int filasAfectadas = db.update(TABLE_NAME, values, COLUMN_NOMBRE, new String[]{nombre});
+            db.close();
+            if (filasAfectadas > 0) {
+                estado = true;
+            }
+        }
+        cursor.close();
+        return false;
     }
-
-
 
 }
 

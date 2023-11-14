@@ -23,6 +23,12 @@
         android:layout_width="match_parent"
         android:layout_height="48dp" />
 
+    <TextView
+        android:id="@+id/textVdatos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/textVdatos" />
+
     <Button
         android:id="@+id/buttonVotos"
         android:layout_width="100dp"
@@ -38,6 +44,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="420dp"
         android:text="@string/buttonVotosFinal" />
+
+
 
 
 </LinearLayout>

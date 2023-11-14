@@ -14,21 +14,21 @@ import com.gabrielsantiago.elecciones.R;
 public class MainActivity extends AppCompatActivity {
 
     DBHelper dbHelper;
+    String dniString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dbHelper = new DBHelper(this);
         Button botonLogin = findViewById(R.id.buttonLogin);
-        EditText dni = findViewById(R.id.editTextLogin);
+        EditText dniEditText = findViewById(R.id.editTextLogin);
+
 
         //Boton que te manda a SpinnerActivity
         botonLogin.setOnClickListener(v -> {
-
-            String dniString = dni.getText().toString();
-            Intent intent = new Intent(MainActivity.this,SpinnerActivity.class);
-            DBHelper dbHelper = new DBHelper(this);
+            dniString = dniEditText.getText().toString();
 
             if (validarDni(dniString)) {
                 //Si el dni es valido:
@@ -37,12 +37,15 @@ public class MainActivity extends AppCompatActivity {
                         // Usuario existe y ha votado
                         Toast.makeText(this, "EL usuario con DNI "+dniString+"" +
                                 " ya ha votado.", Toast.LENGTH_SHORT).show();
-                        intent.putExtra("dniString",dniString);
+                        Intent intent = new Intent(MainActivity.this, SpinnerActivity.class);
+                        intent.putExtra("dni",dniString);
                         startActivity(intent);
                     } else {
                         // Usuario existe pero no ha votado
                         Toast.makeText(this, "EL usuario con DNI "+dniString+"" +
                                 " todavia no ha votado", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this, SpinnerActivity.class);
+                        intent.putExtra("dni",dniString);
                         startActivity(intent);
                     }
                 } else {
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
                     dbHelper.registrarUsuario(dniString);
                     Toast.makeText(this, "EL usuario con DNI "+dniString+"" +
                             " ha sido registrado, vota por favor", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, SpinnerActivity.class);
+                    intent.putExtra("dni",dniString);
                     startActivity(intent);
                 }
             }
